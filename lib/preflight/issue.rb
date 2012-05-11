@@ -3,10 +3,11 @@
 module Preflight
   class Issue
 
-    attr_reader :description, :rule, :attributes
+    attr_reader :description, :rule, :attributes, :kind
 
-    def initialize(description, rule, attributes = {})
+    def initialize(description, rule, attributes = {}, kind = :error)
       @description = description
+      @kind = kind
       if rule.is_a?(Class)
         @rule = rule.to_s.to_sym
       else
