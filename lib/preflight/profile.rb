@@ -22,14 +22,36 @@ module Preflight
         profile.rules.each do |array|
           rules << array
         end
+        profile.errors.each do |array|
+          errors << array
+        end
+        profile.warnings.each do |array|
+          warnings << array
+        end
       end
 
       def rule(*args)
         rules << args
       end
 
+      def error(*args)
+        errors << args
+      end
+
+      def warning(*args)
+        warnings << args
+      end
+
       def rules
         @rules ||= []
+      end
+
+      def errors
+        @errors ||= []
+      end
+
+      def warnings
+        @warnings ||= []
       end
 
     end
@@ -37,6 +59,8 @@ module Preflight
     module InstanceMethods
       def check(input)
         valid_rules?
+        valid_errors?
+        valid_warnings?
 
         if File.file?(input)
           check_filename(input)
@@ -68,6 +92,8 @@ module Preflight
         ["Can't preflight an encrypted PDF"]
       end
 
+      #[:errors, :warnings, :rules]
+
       def instance_rules
         @instance_rules ||= []
       end
@@ -75,6 +101,23 @@ module Preflight
       def all_rules
         self.class.rules + instance_rules
       end
+
+      def instance_errors
+        @instance_errors ||= []
+      end
+
+      def all_errors
+        self.class.errors + instance_errors
+      end
+
+      def instance_warnings
+        @instance_warnings ||= []
+      end
+
+      def all_warnings
+        self.class.warnings + instance_warnings
+      end
+
 
       def check_hash(reader)
         hash_rules.map { |chk|
@@ -104,7 +147,7 @@ module Preflight
       def valid_rules?
         invalid_rules = all_rules.reject { |arr|
           arr.first.instance_methods.map(&:to_sym).include?(:check_hash) ||
-            arr.first.instance_methods.map(&:to_sym).include?(:issues)
+          arr.first.instance_methods.map(&:to_sym).include?(:issues)
         }
         if invalid_rules.size > 0
           raise "The following rules are invalid: #{invalid_rules.join(", ")}. Preflight rules MUST respond to either check_hash() or issues()."
@@ -122,6 +165,66 @@ module Preflight
 
       def page_rules
         all_rules.select { |arr|
+          arr.first.instance_methods.map(&:to_sym).include?(:issues)
+        }.map { |arr|
+          klass = arr[0]
+          klass.new(*arr[1,10])
+        }
+      end
+
+      # ensure all errors follow the prescribed API
+      #
+      def valid_errors?
+        invalid_errors = all_errors.reject { |arr|
+          arr.first.instance_methods.map(&:to_sym).include?(:check_hash) ||
+          arr.first.instance_methods.map(&:to_sym).include?(:issues)
+        }
+        if invalid_errors.size > 0
+          raise "The following errors are invalid: #{invalid_errors.join(", ")}. Preflight errors MUST respond to either check_hash() or issues()."
+        end
+      end
+
+      def hash_errors
+        all_errors.select { |arr|
+          arr.first.instance_methods.map(&:to_sym).include?(:check_hash)
+        }.map { |arr|
+          klass = arr[0]
+          klass.new(*arr[1,10])
+        }
+      end
+
+      def page_errors
+        all_errors.select { |arr|
+          arr.first.instance_methods.map(&:to_sym).include?(:issues)
+        }.map { |arr|
+          klass = arr[0]
+          klass.new(*arr[1,10])
+        }
+      end
+
+      # ensure all warnings follow the prescribed API
+      #
+      def valid_warnings?
+        invalid_warnings = all_warnings.reject { |arr|
+          arr.first.instance_methods.map(&:to_sym).include?(:check_hash) ||
+          arr.first.instance_methods.map(&:to_sym).include?(:issues)
+        }
+        if invalid_warnings.size > 0
+          raise "The following warnings are invalid: #{invalid_warnings.join(", ")}. Preflight warnings MUST respond to either check_hash() or issues()."
+        end
+      end
+
+      def hash_warnings
+        all_warnings.select { |arr|
+          arr.first.instance_methods.map(&:to_sym).include?(:check_hash)
+        }.map { |arr|
+          klass = arr[0]
+          klass.new(*arr[1,10])
+        }
+      end
+
+      def page_warnings
+        all_warnings.select { |arr|
           arr.first.instance_methods.map(&:to_sym).include?(:issues)
         }.map { |arr|
           klass = arr[0]
