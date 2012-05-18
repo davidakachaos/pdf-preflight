@@ -13,7 +13,7 @@ describe InstanceRuleProfile do
     preflight = InstanceRuleProfile.new
     messages  = preflight.check(filename)
 
-    messages.empty?.should be_true
+    messages.should == EMPTY_PROFILE_MESSAGES
   end
 
   it "correctly fail a file that doesn't pass a rule added to the profile instance" do
@@ -23,6 +23,7 @@ describe InstanceRuleProfile do
     messages  = preflight.check(filename)
 
     messages.empty?.should_not be_true
+    messages[:rules].empty?.should_not be_true
   end
 
 end

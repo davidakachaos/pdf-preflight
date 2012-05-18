@@ -75,6 +75,14 @@ module Preflight
         instance_rules << args
       end
 
+      def error(*args)
+        instance_errors << args
+      end
+
+      def warning(*args)
+        instance_warnings << args
+      end
+
       private
 
       def check_filename(filename)
@@ -86,13 +94,20 @@ module Preflight
       def check_io(io)
         PDF::Reader.open(io) do |reader|
           raise PDF::Reader::EncryptedPDFError if reader.objects.encrypted?
-          check_pages(reader) + check_hash(reader)
+          result = check_pages(reader).merge!(check_hash(reader))
+          {
+            rules: result[:rules],
+            errors: result[:errors],
+            warnings: result[:warnings]
+          }
         end
       rescue PDF::Reader::EncryptedPDFError
-        ["Can't preflight an encrypted PDF"]
+        {
+          rules: ["Can't preflight an encrypted PDF"],
+          errors: ["Can't preflight an encrypted PDF"],
+          warnings: []
+        }
       end
-
-      #[:errors, :warnings, :rules]
 
       def instance_rules
         @instance_rules ||= []
@@ -120,21 +135,49 @@ module Preflight
 
 
       def check_hash(reader)
-        hash_rules.map { |chk|
+        issues    = {
+          rules: [],
+          errors: [],
+          warnings: []
+        }
+        issues[:rules] = hash_rules.map { |chk|
           chk.check_hash(reader.objects)
         }.flatten.compact
+        issues[:errors] = hash_errors.map { |chk|
+          chk.check_hash(reader.objects)
+        }.flatten.compact
+        issues[:warnings] = hash_warnings.map { |chk|
+          chk.check_hash(reader.objects)
+        }.flatten.compact
+
+        issues
       rescue PDF::Reader::UnsupportedFeatureError
-        []
+        {
+          rules: [],
+          errors: [],
+          warnings: []
+        }
       end
 
       def check_pages(reader)
         rules_array = page_rules
-        issues    = []
+        errors_array = page_errors
+        warnings_array = page_warnings
+
+        issues    = {
+          rules: [],
+          errors: [],
+          warnings: []
+        }
 
         begin
           reader.pages.each do |page|
             page.walk(*rules_array)
-            issues += rules_array.map(&:issues).flatten.compact
+            page.walk(*errors_array)
+            page.walk(*warnings_array)
+            issues[:rules] += rules_array.map(&:issues).flatten.compact
+            issues[:errors] += rules_array.map(&:issues).flatten.compact
+            issues[:warnings] += rules_array.map(&:issues).flatten.compact
           end
         rescue PDF::Reader::UnsupportedFeatureError
           nil

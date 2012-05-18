@@ -17,7 +17,7 @@ describe "Customised profile that imports the standard PDF/X-1a profile" do
     preflight = CustomImportProfile.new
     messages  = preflight.check(filename)
 
-    messages.empty?.should be_true
+    messages.should == EMPTY_PROFILE_MESSAGES
   end
 
   it "fail a file that isn't PDF/X-1a compliant" do
@@ -25,7 +25,7 @@ describe "Customised profile that imports the standard PDF/X-1a profile" do
     preflight = CustomImportProfile.new
     messages  = preflight.check(filename)
 
-    messages.empty?.should_not be_true
+    messages.should_not == EMPTY_PROFILE_MESSAGES
   end
 
   it "fail a file that has a 72ppi image" do
@@ -33,7 +33,7 @@ describe "Customised profile that imports the standard PDF/X-1a profile" do
     preflight = CustomImportProfile.new
     messages  = preflight.check(filename)
 
-    messages.empty?.should_not be_true
+    messages.should_not == EMPTY_PROFILE_MESSAGES
   end
 
   it "pass a file that has a 300ppi image" do
@@ -41,7 +41,7 @@ describe "Customised profile that imports the standard PDF/X-1a profile" do
     preflight = CustomImportProfile.new
     messages  = preflight.check(filename)
 
-    messages.empty?.should_not be_true
+    messages.should_not == EMPTY_PROFILE_MESSAGES
   end
 
 end
