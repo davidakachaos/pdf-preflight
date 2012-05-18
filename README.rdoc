@@ -19,7 +19,7 @@ any issues that are detected by using some other tool.
 
 == Build status
 
-  {<img src="https://secure.travis-ci.org/davidakachaos/pdf-preflight.png?branch=master" alt="Build Status" />}[http://travis-ci.org/davidakachaos/pdf-preflight]
+  http://travis-ci.org/davidakachaos/pdf-preflight.png
 
 == Installation
 
