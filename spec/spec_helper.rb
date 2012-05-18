@@ -12,3 +12,9 @@ Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f }
 RSpec.configure do |config|
   config.include PreflightSpecHelper
 end
+
+EMPTY_PROFILE_MESSAGES = {
+  rules: [],
+  errors: [],
+  warnings: []
+}

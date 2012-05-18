@@ -11,7 +11,8 @@ end
 class PpiProfile
   include Preflight::Profile
 
-  rule Preflight::Rules::MinPpi, 200
+  warning Preflight::Rules::MinPpi, 200
+  error Preflight::Rules::MinPpi, 150
 end
 
 describe "Customised profile" do
@@ -29,12 +30,13 @@ describe "Customised profile" do
     preflight = CustomProfile.new
     messages  = preflight.check(filename)
 
-    messages.should be_empty
+    messages.should == EMPTY_PROFILE_MESSAGES
   end
 
   it "fail files with a low ppi" do
     filename = pdf_spec_file("72ppi")
     preflight = PpiProfile.new
+
     messages  = preflight.check(filename)
 
     messages.should_not be_empty
@@ -45,7 +47,7 @@ describe "Customised profile" do
     preflight = PpiProfile.new
     messages  = preflight.check(filename)
 
-    messages.should be_empty
+    messages.should == EMPTY_PROFILE_MESSAGES
   end
 
 end

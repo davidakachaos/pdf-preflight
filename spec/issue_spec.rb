@@ -6,7 +6,8 @@ describe Preflight::Issue do
     let!(:issue) do
       Preflight::Issue.new("Transparency detected",
                            Preflight::Rules::NoTransparency,
-                           {:page => 1}
+                           {:page => 1},
+                           :error
                           )
     end
 
@@ -24,6 +25,10 @@ describe Preflight::Issue do
 
     it "should return the attributes via methods" do
       issue.page.should == 1
+    end
+
+    it "should return the kind as a symbol" do
+      issue.kind.should == :error
     end
 
     it "should return true to a respond_to? call" do
