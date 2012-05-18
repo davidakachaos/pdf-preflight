@@ -17,6 +17,10 @@ Unlike some preflight tools, this library doesn't attempt to fix any issues. It
 only reports them. That may change one day, but for now you will need to fix
 any issues that are detected by using some other tool.
 
+== Build status
+
+  {<img src="https://secure.travis-ci.org/davidakachaos/pdf-preflight.png?branch=master" alt="Build Status" />}[http://travis-ci.org/davidakachaos/pdf-preflight]
+
 == Installation
 
   gem install preflight
