@@ -1,4 +1,4 @@
-= Preflight
+= Preflight {<img src="https://secure.travis-ci.org/davidakachaos/pdf-preflight.png" />}[http://travis-ci.org/davidakachaos/pdf-preflight]
 
 Check your PDF files meet the standard you require.
 
@@ -16,10 +16,6 @@ and friends, but hopefully it'll get you most of the way with less stress.
 Unlike some preflight tools, this library doesn't attempt to fix any issues. It
 only reports them. That may change one day, but for now you will need to fix
 any issues that are detected by using some other tool.
-
-== Build status
-
-  http://travis-ci.org/davidakachaos/pdf-preflight.png
 
 == Installation
 
